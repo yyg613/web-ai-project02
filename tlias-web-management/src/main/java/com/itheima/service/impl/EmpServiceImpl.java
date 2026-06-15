@@ -27,9 +27,24 @@ public class EmpServiceImpl implements EmpService {
 
     @Override
     public PageResult<Emp> page(EmpQueryParam empQueryParam) {
+        // 1. 分页查询员工基本信息
         PageHelper.startPage(empQueryParam.getPage(), empQueryParam.getPageSize());
         List<Emp> rows = empMapper.list(empQueryParam);
         PageInfo<Emp> pageInfo = new PageInfo<>(rows);
+
+        // 2. 批量查询工作经历并填充（回显）
+        if (!CollectionUtils.isEmpty(rows)) {
+            List<Integer> empIds = rows.stream()
+                    .map(Emp::getId)
+                    .toList();
+            List<EmpExpr> allExprs = empExprMapper.selectByEmpIds(empIds);
+
+            // 按 empId 分组，填充到对应员工
+            var exprMap = allExprs.stream()
+                    .collect(java.util.stream.Collectors.groupingBy(EmpExpr::getEmpId));
+            rows.forEach(emp -> emp.setEmpList(exprMap.get(emp.getId())));
+        }
+
         return new PageResult<>(pageInfo.getTotal(), pageInfo.getList());
     }
     @Transactional(rollbackFor = {Exception.class}) //事务管理
@@ -78,9 +93,12 @@ public class EmpServiceImpl implements EmpService {
         }
     }
 
+    @Transactional(rollbackFor = {Exception.class})//获取到生成的主键--主键返回
     @Override
     public void delete(List<Integer> ids) {
+        //批量删除员工基本信息
         empMapper.deleteByIds(ids);
+        //批量删除员工工作信息
         empExprMapper.deleteByEmpIds(ids);
     }
 
