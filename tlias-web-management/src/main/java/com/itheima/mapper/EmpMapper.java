@@ -5,6 +5,7 @@ import com.itheima.pojo.EmpQueryParam;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface EmpMapper {
@@ -34,4 +35,13 @@ public interface EmpMapper {
      */
     void deleteByIds(List<Integer> ids);
 
+    /**
+     * 按职位统计员工人数
+     */
+    List<Map<String, Object>> countEmpJobData();
+
+    /**
+     * 统计员工性别人数
+     */
+    List<Map<String, Object>> countEmpGenderData();
 }
