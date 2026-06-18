@@ -521,7 +521,152 @@ Content-Type: multipart/form-data
 
 ---
 
-## 五、数据字典
+## 五、班级管理 `/clazzs`
+
+### 5.1 条件分页查询班级
+
+```
+GET /clazzs
+```
+
+**Query 参数**
+
+| 参数      | 类型   | 必填 | 默认值 | 说明                        |
+|-----------|--------|------|--------|-----------------------------|
+| page      | int    | 否   | 1      | 当前页码                    |
+| pageSize  | int    | 否   | 10     | 每页记录数                  |
+| className | string | 否   | -      | 班级名称（模糊匹配）        |
+| begin     | string | 否   | -      | 开课日期-开始，`yyyy-MM-dd` |
+| end       | string | 否   | -      | 开课日期-结束，`yyyy-MM-dd` |
+
+**响应示例**
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "data": {
+    "total": 6,
+    "rows": [
+      {
+        "id": 7,
+        "name": "黄埔四期",
+        "room": "209",
+        "beginDate": "2023-08-01",
+        "endDate": "2024-02-15",
+        "masterId": 7,
+        "masterName": "纪晓芙",
+        "status": "已结课"
+      }
+    ]
+  }
+}
+```
+
+**status 状态规则**
+
+| 条件 | 状态值 |
+|------|--------|
+| 当前时间 > 结课时间 | 已结课 |
+| 当前时间 < 开课时间 | 未开班 |
+| 开课 ≤ 当前 ≤ 结课 | 在读中 |
+
+---
+
+### 5.2 查询全部班级
+
+```
+GET /clazzs/list
+```
+
+无请求参数，返回所有班级列表（含状态、班主任名）。
+
+---
+
+## 六、报表统计 `/report`
+
+### 6.1 职位人数统计
+
+```
+GET /report/empJobData
+```
+
+**响应示例**
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "data": {
+    "jobList": ["班主任", "讲师", "学工主管", "教研主管", "咨询师"],
+    "dataList": [3, 5, 2, 1, 4]
+  }
+}
+```
+
+> `jobList` 为职位名称数组，`dataList` 为对应人数数组，顺序一一对应。
+
+---
+
+### 6.2 性别人数统计
+
+```
+GET /report/empGenderData
+```
+
+**响应示例**
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "data": [
+    { "name": "男", "value": 12 },
+    { "name": "女", "value": 8 }
+  ]
+}
+```
+
+---
+
+## 七、文件上传 `/upload`
+
+### 7.1 上传头像
+
+```
+POST /upload
+Content-Type: multipart/form-data
+```
+
+**请求参数（FormData）**
+
+| 参数 | 类型 | 必填 | 说明                                      |
+|------|------|------|-------------------------------------------|
+| file | File | 是   | 图片文件，PNG/JPEG/JPG，大小 ≤ 2MB |
+
+**校验规则**
+
+| 校验项 | 规则 | 失败提示 |
+|--------|------|----------|
+| 非空校验 | 文件不能为空 | "请选择要上传的文件" |
+| 格式校验 | 仅支持 PNG、JPEG、JPG | "仅支持 PNG、JPEG、JPG 格式的图片" |
+| 大小校验 | 不超过 2MB | "文件大小不能超过2MB" |
+
+**响应示例**
+
+```json
+{
+  "code": 1,
+  "msg": "success",
+  "data": "https://java-hytrix.oss-cn-beijing.aliyuncs.com/xxx.jpg"
+}
+```
+
+> `data` 为上传后的 OSS 图片访问 URL，将其作为 `image` 字段传给新增/修改员工的接口即可完成头像绑定。
+
+---
+
+## 八、数据字典
 
 ### 5.1 性别（gender）
 
@@ -542,7 +687,7 @@ Content-Type: multipart/form-data
 
 ---
 
-## 六、错误码
+## 九、错误码
 
 | code | 说明     | 典型场景               |
 |------|----------|------------------------|
@@ -551,28 +696,33 @@ Content-Type: multipart/form-data
 
 ---
 
-## 七、接口总览
+## 十、接口总览
 
-| # | 方法   | 路径            | 说明               |
-|---|--------|-----------------|--------------------|
-| 1 | GET    | `/depts`        | 查询全部部门       |
-| 2 | GET    | `/depts/{id}`   | 根据 ID 查询部门   |
-| 3 | POST   | `/depts`        | 新增部门           |
-| 4 | PUT    | `/depts/{id}`   | 修改部门           |
-| 5 | DELETE | `/depts/{id}`   | 删除部门           |
-| 6 | GET    | `/emps`         | 条件分页查询员工   |
-| 7 | POST   | `/emps`         | 新增员工           |
-| 8 | PUT    | `/emps/{id}`    | 修改员工           |
-| 9 | DELETE | `/emps/{ids}`   | 批量删除员工       |
-|10 | POST   | `/upload`       | 上传头像文件       |
+| #  | 方法   | 路径                 | 说明               |
+|----|--------|----------------------|--------------------|
+| 1  | GET    | `/depts`             | 查询全部部门       |
+| 2  | GET    | `/depts/{id}`        | 根据 ID 查询部门   |
+| 3  | POST   | `/depts`             | 新增部门           |
+| 4  | PUT    | `/depts/{id}`        | 修改部门           |
+| 5  | DELETE | `/depts/{id}`        | 删除部门           |
+| 6  | GET    | `/emps`              | 条件分页查询员工   |
+| 7  | POST   | `/emps`              | 新增员工           |
+| 8  | PUT    | `/emps/{id}`         | 修改员工           |
+| 9  | DELETE | `/emps/{ids}`        | 批量删除员工       |
+| 10 | GET    | `/clazzs`            | 条件分页查询班级   |
+| 11 | GET    | `/clazzs/list`       | 查询全部班级       |
+| 12 | GET    | `/report/empJobData` | 职位人数统计       |
+| 13 | GET    | `/report/empGenderData` | 性别人数统计    |
+| 14 | POST   | `/upload`            | 上传头像文件       |
 
 ---
 
-## 八、附录
+## 十一、附录
 
 1. 新增/修改员工时会自动维护 `createTime` 与 `updateTime` 时间戳
 2. 员工姓名查询为**模糊匹配**，大小写不敏感
 3. 批量删除传入的多个 ID 以英文逗号分隔，**不含空格**
 4. 修改员工时传入 `empList` 会**先删除原有经历再批量新增**；不传则保留原有经历不变
 5. 头像上传成功后返回的是可访问的 **完整 URL**，可直接用于 `<img>` 标签
-6. 开发环境 Vite 将 `/api/*` → `http://localhost:8080/*`，生产环境由 Nginx 代理
+6. 班级状态由数据库实时计算（未开班 / 在读中 / 已结课）
+7. 开发环境 Vite 将 `/api/*` → `http://localhost:8080/*`，生产环境由 Nginx 代理

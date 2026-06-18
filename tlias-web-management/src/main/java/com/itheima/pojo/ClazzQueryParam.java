@@ -6,11 +6,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Data
-public class EmpQueryParam {
+public class ClazzQueryParam {
     private Integer page = 1;
     private Integer pageSize = 10;
-    private String name;
-    private Integer gender;
+    private String className;
+    private String teacherName;
+    private Integer classId;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate begin;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

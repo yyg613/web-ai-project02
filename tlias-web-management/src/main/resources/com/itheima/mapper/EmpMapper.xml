@@ -15,8 +15,11 @@
             <if test="gender != null">
                 and e.gender = #{gender}
             </if>
-            <if test="begin != null and end != null">
-                and e.entry_date between #{begin} and #{end}
+            <if test="begin != null">
+                and e.entry_date &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and e.entry_date &lt;= #{end}
             </if>
         </where>
         order by e.update_time desc

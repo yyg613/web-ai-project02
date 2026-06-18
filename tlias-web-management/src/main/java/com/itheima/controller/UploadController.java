@@ -31,6 +31,8 @@ public class UploadController {
      * 文件上传接口 - 上传到阿里云OSS
      * @param file 上传的文件
      * @return 返回OSS文件访问URL
+     *
+     *
      */
     @PostMapping("/upload")
     public Result upload(MultipartFile file) throws IOException {

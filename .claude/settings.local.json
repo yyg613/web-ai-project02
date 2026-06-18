@@ -7,7 +7,8 @@
       "Bash(cmd //c \"sc query MySQL 2>&1\")",
       "Bash(cmd //c \"sc query MySQL80 2>&1\")",
       "Bash(cmd //c \"sc query state= all | findstr -i mysql\")",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:heuqqdmbyk.feishu.cn)"
     ]
   }
 }
